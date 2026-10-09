@@ -1,6 +1,9 @@
 # Environment variables (Berisi kredensial rahasia)
 .env
 
+# AI & Internal Documentation
+.ai-docs/
+
 # Binaries and compiled files
 *.exe
 *.exe~
@@ -26,4 +29,3 @@ go-learning.exe
 Thumbs.db
 Desktop.ini
 .DS_Store
-
