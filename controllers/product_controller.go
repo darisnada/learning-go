@@ -38,12 +38,12 @@ func GetProducts(c *gin.Context) {
 	})
 }
 
-// GetProductByID menampilkan detail satu produk berdasarkan ID
+// GetProductByID menampilkan detail satu produk berdasarkan ID UUID
 func GetProductByID(c *gin.Context) {
 	id := c.Param("id")
 	var product models.Product
 
-	if err := config.DB.Preload("User").First(&product, id).Error; err != nil {
+	if err := config.DB.Preload("User").Where("id = ?", id).First(&product).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Produk tidak ditemukan"})
 		return
 	}
@@ -68,12 +68,18 @@ func CreateProduct(c *gin.Context) {
 		return
 	}
 
+	userIDStr, ok := userID.(string)
+	if !ok || userIDStr == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID tidak valid"})
+		return
+	}
+
 	product := models.Product{
 		Name:        input.Name,
 		Description: input.Description,
 		Price:       input.Price,
 		Stock:       input.Stock,
-		UserID:      userID.(uint),
+		UserID:      userIDStr,
 	}
 
 	if err := config.DB.Create(&product).Error; err != nil {
@@ -87,12 +93,12 @@ func CreateProduct(c *gin.Context) {
 	})
 }
 
-// UpdateProduct memperbarui data produk berdasarkan ID (memerlukan token login)
+// UpdateProduct memperbarui data produk berdasarkan ID UUID
 func UpdateProduct(c *gin.Context) {
 	id := c.Param("id")
 	var product models.Product
 
-	if err := config.DB.First(&product, id).Error; err != nil {
+	if err := config.DB.Where("id = ?", id).First(&product).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Produk tidak ditemukan"})
 		return
 	}
@@ -119,12 +125,12 @@ func UpdateProduct(c *gin.Context) {
 	})
 }
 
-// DeleteProduct menghapus produk berdasarkan ID (memerlukan token login)
+// DeleteProduct menghapus produk berdasarkan ID UUID
 func DeleteProduct(c *gin.Context) {
 	id := c.Param("id")
 	var product models.Product
 
-	if err := config.DB.First(&product, id).Error; err != nil {
+	if err := config.DB.Where("id = ?", id).First(&product).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Produk tidak ditemukan"})
 		return
 	}
@@ -138,4 +144,3 @@ func DeleteProduct(c *gin.Context) {
 		"message": "Produk berhasil dihapus",
 	})
 }
-

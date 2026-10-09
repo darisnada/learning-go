@@ -8,6 +8,7 @@ Aplikasi REST API lengkap dengan autentikasi JWT, sistem otorisasi **RBAC (Role-
 - **Bahasa**: Go (Golang)
 - **Framework Web**: [Gin Gonic](https://github.com/gin-gonic/gin)
 - **ORM**: [GORM](https://gorm.io/) + Driver MySQL
+- **Identifier**: UUID v4 ([github.com/google/uuid](https://github.com/google/uuid)) pada seluruh tabel
 - **Autentikasi**: [golang-jwt/jwt/v5](https://github.com/golang-jwt/jwt) & [bcrypt](https://pkg.go.dev/golang.org/x/crypto/bcrypt)
 - **Otorisasi**: RBAC Middleware (`middlewares.RequirePermission`)
 - **Env Loader**: [godotenv](https://github.com/joho/godotenv)

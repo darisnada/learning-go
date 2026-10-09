@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "c1f7b8a2-3e4b-4a5d-b891-98721cba1024",
-		"name": "Go REST API (Gin + GORM + MySQL RBAC)",
-		"description": "Postman Collection lengkap untuk Go REST API dengan autentikasi JWT dan RBAC (Role-Based Access Control).",
+		"name": "Go REST API (Gin + GORM + MySQL RBAC UUID)",
+		"description": "Postman Collection lengkap untuk Go REST API dengan autentikasi JWT, UUID v4, dan RBAC (Role-Based Access Control).",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"variable": [
@@ -14,6 +14,11 @@
 		{
 			"key": "token",
 			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "productId",
+			"value": "8d78882e-42cb-4974-801b-cad0b8ffce38",
 			"type": "string"
 		}
 	],
@@ -69,7 +74,7 @@
 								"register"
 							]
 						},
-						"description": "Mendaftarkan user baru dengan default role 'user'."
+						"description": "Mendaftarkan user baru dengan default role 'user' dan UUID."
 					},
 					"response": []
 				},
@@ -83,7 +88,7 @@
 									"var jsonData = pm.response.json();",
 									"if (jsonData.token) {",
 									"    pm.collectionVariables.set(\"token\", jsonData.token);",
-									"    console.log(\"Token berhasil disimpan ke variabel: \" + jsonData.token);",
+									"    console.log(\"Token Admin berhasil disimpan: \" + jsonData.token);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -113,7 +118,7 @@
 								"login"
 							]
 						},
-						"description": "Login sebagai Admin (Memiliki hak akses penuh). Token akan otomatis tersimpan ke variabel {{token}}."
+						"description": "Login sebagai Admin. Token otomatis tersimpan ke variabel {{token}}."
 					},
 					"response": []
 				},
@@ -127,7 +132,7 @@
 									"var jsonData = pm.response.json();",
 									"if (jsonData.token) {",
 									"    pm.collectionVariables.set(\"token\", jsonData.token);",
-									"    console.log(\"Token Staff disimpan: \" + jsonData.token);",
+									"    console.log(\"Token Staff berhasil disimpan: \" + jsonData.token);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -171,7 +176,7 @@
 									"var jsonData = pm.response.json();",
 									"if (jsonData.token) {",
 									"    pm.collectionVariables.set(\"token\", jsonData.token);",
-									"    console.log(\"Token User disimpan: \" + jsonData.token);",
+									"    console.log(\"Token User berhasil disimpan: \" + jsonData.token);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -226,7 +231,7 @@
 								"me"
 							]
 						},
-						"description": "Melihat detail profil dan permission user yang sedang login."
+						"description": "Melihat detail profil UUID dan permission user yang sedang login."
 					},
 					"response": []
 				}
@@ -237,6 +242,21 @@
 			"item": [
 				{
 					"name": "Get All Products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.length > 0) {",
+									"    pm.collectionVariables.set(\"productId\", jsonData.data[0].id);",
+									"    console.log(\"Product ID UUID disimpan: \" + jsonData.data[0].id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [
@@ -255,7 +275,7 @@
 								"products"
 							]
 						},
-						"description": "Mengambil semua produk. Memerlukan permission 'read-product'."
+						"description": "Mengambil semua produk. Otomatis menyimpan UUID produk pertama ke variabel {{productId}}."
 					},
 					"response": []
 				},
@@ -300,22 +320,37 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/products/1",
+							"raw": "{{baseUrl}}/api/products/{{productId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"products",
-								"1"
+								"{{productId}}"
 							]
 						},
-						"description": "Mengambil detail satu produk."
+						"description": "Mengambil detail satu produk berdasarkan UUID."
 					},
 					"response": []
 				},
 				{
 					"name": "Create Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.id) {",
+									"    pm.collectionVariables.set(\"productId\", jsonData.data.id);",
+									"    console.log(\"Product baru dibuat dengan UUID: \" + jsonData.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -342,7 +377,7 @@
 								"products"
 							]
 						},
-						"description": "Menambahkan produk baru. Memerlukan permission 'create-product' (Admin / Staff)."
+						"description": "Menambahkan produk baru dengan UUID otomatis. Memerlukan permission 'create-product'."
 					},
 					"response": []
 				},
@@ -365,17 +400,17 @@
 							"raw": "{\n  \"name\": \"Laptop Asus ROG Zephyrus G16 (2026)\",\n  \"description\": \"Versi upgrade dengan prosesor Intel Core Ultra 9 dan 32GB RAM.\",\n  \"price\": 28999000,\n  \"stock\": 10\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/products/1",
+							"raw": "{{baseUrl}}/api/products/{{productId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"products",
-								"1"
+								"{{productId}}"
 							]
 						},
-						"description": "Memperbarui produk. Memerlukan permission 'update-product' (Admin / Staff)."
+						"description": "Memperbarui produk berdasarkan UUID. Memerlukan permission 'update-product'."
 					},
 					"response": []
 				},
@@ -390,17 +425,17 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/products/1",
+							"raw": "{{baseUrl}}/api/products/{{productId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"products",
-								"1"
+								"{{productId}}"
 							]
 						},
-						"description": "Menghapus produk. Memerlukan permission 'delete-product' (Hanya Admin)."
+						"description": "Menghapus produk berdasarkan UUID. Memerlukan permission 'delete-product' (Hanya Admin)."
 					},
 					"response": []
 				}

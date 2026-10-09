@@ -3,20 +3,28 @@ package models
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
 type User struct {
-	ID        uint           `gorm:"primaryKey" json:"id"`
+	ID        string         `gorm:"type:char(36);primaryKey" json:"id"`
 	Name      string         `gorm:"type:varchar(100);not null" json:"name" binding:"required"`
 	Email     string         `gorm:"type:varchar(191);uniqueIndex;not null" json:"email" binding:"required,email"`
 	Password  string         `gorm:"type:varchar(255);not null" json:"password,omitempty" binding:"required,min=6"`
-	RoleID    uint           `gorm:"not null;default:3" json:"role_id"`
+	RoleID    string         `gorm:"type:char(36);not null" json:"role_id"`
 	Role      *Role          `gorm:"foreignKey:RoleID" json:"role,omitempty"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+}
+
+func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+	if u.ID == "" {
+		u.ID = uuid.NewString()
+	}
+	return
 }
 
 // HashPassword hashes user's plain text password using bcrypt

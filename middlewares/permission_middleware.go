@@ -19,8 +19,15 @@ func RequirePermission(permissionName string) gin.HandlerFunc {
 			return
 		}
 
+		userIDStr, ok := userID.(string)
+		if !ok || userIDStr == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID tidak valid"})
+			c.Abort()
+			return
+		}
+
 		var user models.User
-		if err := config.DB.Preload("Role.Permissions").First(&user, userID).Error; err != nil {
+		if err := config.DB.Preload("Role.Permissions").Where("id = ?", userIDStr).First(&user).Error; err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Pengguna tidak ditemukan"})
 			c.Abort()
 			return
@@ -38,4 +45,3 @@ func RequirePermission(permissionName string) gin.HandlerFunc {
 		c.Next()
 	}
 }
-

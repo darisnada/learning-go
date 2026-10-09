@@ -1,12 +1,13 @@
 # Dokumentasi REST API
 
-Dokumentasi lengkap seluruh endpoint API yang tersedia, dikelompokkan berdasarkan fitur, lengkap dengan metode HTTP, header, format payload (request body), permission yang dibutuhkan, dan contoh respon.
+Dokumentasi lengkap seluruh endpoint API yang tersedia, dikelompokkan berdasarkan fitur, lengkap dengan metode HTTP, header, format payload (request body), permission yang dibutuhkan, dan contoh respon. Semua entitas menggunakan format **UUID v4**.
 
 ---
 
 ## 🌐 Informasi Umum
 - **Base URL**: `http://localhost:8080`
 - **Format Pertukaran Data**: `application/json`
+- **Tipe ID**: `UUID v4` (String 36 karakter, contoh: `8d78882e-42cb-4974-801b-cad0b8ffce38`)
 - **Header Autentikasi**:
   ```http
   Authorization: Bearer <TOKEN_JWT_ANDA>
@@ -85,15 +86,15 @@ Mendaftarkan akun pengguna baru. Akun baru secara default akan memiliki role `us
   {
     "message": "Registrasi berhasil",
     "data": {
-      "id": 4,
+      "id": "c1f7b8a2-3e4b-4a5d-b891-98721cba1024",
       "name": "Budi Santoso",
       "email": "budi@example.com",
       "role": {
-        "id": 3,
+        "id": "73f5c7c8-c0da-43e1-ba5f-9e252d22a537",
         "name": "user",
         "description": "Pengguna biasa"
       },
-      "created_at": "2026-10-09T10:44:34.500+07:00"
+      "created_at": "2026-10-09T11:11:39+07:00"
     }
   }
   ```
@@ -122,20 +123,20 @@ Melakukan login untuk mendapatkan JWT Token yang digunakan pada endpoint yang te
   ```json
   {
     "message": "Login berhasil",
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwiZXhwIjoxNzg5MDUwNjc0LCJpYXQiOjE3ODg5NjQyNzR9...",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZThlZDU3NGYtOWVjYS00ODIxLTk1YTAtNjkwZDk4YzE4MmJjIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsImV4cCI6MTc4OTA1MDY3NH0...",
     "user": {
-      "id": 1,
+      "id": "e8ed574f-9eca-4821-95a0-690d98c182bc",
       "name": "Admin Toko",
       "email": "admin@example.com",
       "role": {
-        "id": 1,
+        "id": "4a95116a-9dad-4ebe-9aaf-835c11167f47",
         "name": "admin",
         "description": "Akses penuh sistem",
         "permissions": [
-          { "id": 1, "name": "read-product", "description": "Melihat daftar dan detail produk" },
-          { "id": 2, "name": "create-product", "description": "Menambahkan produk baru" },
-          { "id": 3, "name": "update-product", "description": "Memperbarui informasi produk" },
-          { "id": 4, "name": "delete-product", "description": "Menghapus produk" }
+          { "id": "10134ee1-a0c1-48b2-b34c-31ec8fa181d2", "name": "read-product", "description": "Melihat daftar dan detail produk" },
+          { "id": "e8196784-b678-4e58-869e-76c8dbb0208c", "name": "create-product", "description": "Menambahkan produk baru" },
+          { "id": "5addc9aa-eba9-410d-a965-099a4a329fc4", "name": "update-product", "description": "Memperbarui informasi produk" },
+          { "id": "d9d2515e-4a37-4982-ae17-41e7124238a4", "name": "delete-product", "description": "Menghapus produk" }
         ]
       }
     }
@@ -163,20 +164,20 @@ Melihat data pengguna dan hak akses permission yang sedang login.
   ```json
   {
     "data": {
-      "id": 1,
+      "id": "e8ed574f-9eca-4821-95a0-690d98c182bc",
       "name": "Admin Toko",
       "email": "admin@example.com",
       "role": {
-        "id": 1,
+        "id": "4a95116a-9dad-4ebe-9aaf-835c11167f47",
         "name": "admin",
         "permissions": [
-          { "id": 1, "name": "read-product" },
-          { "id": 2, "name": "create-product" },
-          { "id": 3, "name": "update-product" },
-          { "id": 4, "name": "delete-product" }
+          { "id": "10134ee1-a0c1-48b2-b34c-31ec8fa181d2", "name": "read-product" },
+          { "id": "e8196784-b678-4e58-869e-76c8dbb0208c", "name": "create-product" },
+          { "id": "5addc9aa-eba9-410d-a965-099a4a329fc4", "name": "update-product" },
+          { "id": "d9d2515e-4a37-4982-ae17-41e7124238a4", "name": "delete-product" }
         ]
       },
-      "created_at": "2026-10-09T10:44:34.500+07:00"
+      "created_at": "2026-10-09T11:11:39+07:00"
     }
   }
   ```
@@ -208,14 +209,14 @@ Mengambil seluruh data produk. Mendukung filter pencarian berdasarkan nama produ
     "message": "Berhasil mengambil data produk",
     "data": [
       {
-        "id": 1,
+        "id": "8d78882e-42cb-4974-801b-cad0b8ffce38",
         "name": "Laptop Asus ROG Zephyrus",
         "description": "Laptop gaming bertenaga tinggi dengan layar 165Hz dan RTX 4070.",
         "price": 24999000,
         "stock": 15,
-        "user_id": 1,
-        "created_at": "2026-10-09T10:44:34.500+07:00",
-        "updated_at": "2026-10-09T10:44:34.500+07:00"
+        "user_id": "e8ed574f-9eca-4821-95a0-690d98c182bc",
+        "created_at": "2026-10-09T11:11:39+07:00",
+        "updated_at": "2026-10-09T11:11:39+07:00"
       }
     ]
   }
@@ -224,9 +225,9 @@ Mengambil seluruh data produk. Mendukung filter pencarian berdasarkan nama produ
 ---
 
 ### • Product Get by ID (Detail Produk)
-Mengambil detail satu produk berdasarkan ID.
+Mengambil detail satu produk berdasarkan UUID.
 - **Method**: `GET`
-- **URL**: `/api/products/:id` (Contoh: `/api/products/1`)
+- **URL**: `/api/products/:id` (Contoh: `/api/products/8d78882e-42cb-4974-801b-cad0b8ffce38`)
 - **Autentikasi**: Wajib Login (`Bearer Token`)
 - **Permission Diperlukan**: `read-product`
 - **Role yang Diizinkan**: `admin`, `staff`, `user`
@@ -239,12 +240,12 @@ Mengambil detail satu produk berdasarkan ID.
   {
     "message": "Detail produk ditemukan",
     "data": {
-      "id": 1,
+      "id": "8d78882e-42cb-4974-801b-cad0b8ffce38",
       "name": "Laptop Asus ROG Zephyrus",
       "description": "Laptop gaming bertenaga tinggi dengan layar 165Hz dan RTX 4070.",
       "price": 24999000,
       "stock": 15,
-      "user_id": 1
+      "user_id": "e8ed574f-9eca-4821-95a0-690d98c182bc"
     }
   }
   ```
@@ -258,7 +259,7 @@ Mengambil detail satu produk berdasarkan ID.
 ---
 
 ### • Product Create (Tambah Produk)
-Menambahkan produk baru ke dalam sistem.
+Menambahkan produk baru ke dalam sistem. ID produk akan otomatis di-generate berupa UUID v4.
 - **Method**: `POST`
 - **URL**: `/api/products`
 - **Autentikasi**: Wajib Login (`Bearer Token`)
@@ -283,18 +284,18 @@ Menambahkan produk baru ke dalam sistem.
   {
     "message": "Produk berhasil ditambahkan",
     "data": {
-      "id": 6,
+      "id": "e45a1910-b77e-49b0-9db0-f8ca779eb672",
       "name": "Mechanical Keyboard Custom",
       "description": "Keyboard mekanik 75% hot-swappable dengan gasket mount.",
       "price": 1850000,
       "stock": 12,
-      "user_id": 1,
-      "created_at": "2026-10-09T10:48:00+07:00",
-      "updated_at": "2026-10-09T10:48:00+07:00"
+      "user_id": "e8ed574f-9eca-4821-95a0-690d98c182bc",
+      "created_at": "2026-10-09T11:15:00+07:00",
+      "updated_at": "2026-10-09T11:15:00+07:00"
     }
   }
   ```
-- **Response `403 Forbidden`** (Jika role tidak punya permission `create-product`, misal `user` biasa):
+- **Response `403 Forbidden`** (Jika role tidak punya permission `create-product`):
   ```json
   {
     "error": "Akses ditolak: Anda tidak memiliki izin untuk tindakan ini",
@@ -305,9 +306,9 @@ Menambahkan produk baru ke dalam sistem.
 ---
 
 ### • Product Update (Ubah Data Produk)
-Memperbarui informasi nama, deskripsi, harga, atau stok produk.
+Memperbarui informasi produk berdasarkan ID UUID.
 - **Method**: `PUT`
-- **URL**: `/api/products/:id` (Contoh: `/api/products/1`)
+- **URL**: `/api/products/:id` (Contoh: `/api/products/8d78882e-42cb-4974-801b-cad0b8ffce38`)
 - **Autentikasi**: Wajib Login (`Bearer Token`)
 - **Permission Diperlukan**: `update-product`
 - **Role yang Diizinkan**: `admin`, `staff`
@@ -330,17 +331,17 @@ Memperbarui informasi nama, deskripsi, harga, atau stok produk.
   {
     "message": "Produk berhasil diperbarui",
     "data": {
-      "id": 1,
+      "id": "8d78882e-42cb-4974-801b-cad0b8ffce38",
       "name": "Laptop Asus ROG Zephyrus G16 (2026)",
       "description": "Versi upgrade dengan prosesor Intel Core Ultra 9 dan 32GB RAM.",
       "price": 28999000,
       "stock": 10,
-      "user_id": 1,
-      "updated_at": "2026-10-09T10:49:15+07:00"
+      "user_id": "e8ed574f-9eca-4821-95a0-690d98c182bc",
+      "updated_at": "2026-10-09T11:16:00+07:00"
     }
   }
   ```
-- **Response `403 Forbidden`** (Jika role tidak punya permission `update-product`, misal `user` biasa):
+- **Response `403 Forbidden`**:
   ```json
   {
     "error": "Akses ditolak: Anda tidak memiliki izin untuk tindakan ini",
@@ -351,9 +352,9 @@ Memperbarui informasi nama, deskripsi, harga, atau stok produk.
 ---
 
 ### • Product Delete (Hapus Produk)
-Menghapus produk dari sistem (menggunakan *soft delete* GORM).
+Menghapus produk dari sistem berdasarkan ID UUID.
 - **Method**: `DELETE`
-- **URL**: `/api/products/:id` (Contoh: `/api/products/1`)
+- **URL**: `/api/products/:id` (Contoh: `/api/products/8d78882e-42cb-4974-801b-cad0b8ffce38`)
 - **Autentikasi**: Wajib Login (`Bearer Token`)
 - **Permission Diperlukan**: `delete-product`
 - **Role yang Diizinkan**: **Hanya `admin`**
@@ -367,32 +368,10 @@ Menghapus produk dari sistem (menggunakan *soft delete* GORM).
     "message": "Produk berhasil dihapus"
   }
   ```
-- **Response `403 Forbidden`** (Jika dicoba oleh role `staff` atau `user` biasa):
+- **Response `403 Forbidden`**:
   ```json
   {
     "error": "Akses ditolak: Anda tidak memiliki izin untuk tindakan ini",
     "permission": "delete-product"
   }
   ```
-- **Response `404 Not Found`**:
-  ```json
-  {
-    "error": "Produk tidak ditemukan"
-  }
-  ```
-
----
-
-## ⚠️ Respon Kode HTTP Umum
-
-| Status Code | Makna | Penyebab |
-| :---: | :--- | :--- |
-| **`200 OK`** | Berhasil | Request berhasil diproses. |
-| **`201 Created`** | Berhasil Dibuat | Data baru (User atau Produk) berhasil dibuat. |
-| **`400 Bad Request`** | Data Tidak Valid | Format JSON salah atau ada field wajib yang kosong / tidak memenuhi validasi. |
-| **`401 Unauthorized`** | Tidak Terotentikasi | Token JWT tidak dikirim, format bukan `Bearer <token>`, atau token kedaluwarsa. |
-| **`403 Forbidden`** | Akses Ditolak | Token valid, namun role pengguna tidak memiliki izin (permission) yang sesuai. |
-| **`404 Not Found`** | Tidak Ditemukan | Data yang dicari berdasarkan ID tidak ada di database. |
-| **`409 Conflict`** | Duplikasi Data | Email yang didaftarkan sudah ada di sistem. |
-| **`500 Internal Error`** | Kesalahan Server | Terjadi error pada database atau server internal. |
-

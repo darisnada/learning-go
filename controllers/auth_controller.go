@@ -14,7 +14,7 @@ type RegisterInput struct {
 	Name     string `json:"name" binding:"required"`
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=6"`
-	RoleID   uint   `json:"role_id"` // Opsional, default role jika 0 adalah "user"
+	RoleID   string `json:"role_id"` // Opsional, default role jika kosong adalah "user"
 }
 
 type LoginInput struct {
@@ -39,12 +39,10 @@ func Register(c *gin.Context) {
 
 	// Tentukan RoleID (default ke role 'user' jika tidak disediakan)
 	roleID := input.RoleID
-	if roleID == 0 {
+	if roleID == "" {
 		var userRole models.Role
 		if err := config.DB.Where("name = ?", "user").First(&userRole).Error; err == nil {
 			roleID = userRole.ID
-		} else {
-			roleID = 1
 		}
 	}
 
@@ -65,7 +63,7 @@ func Register(c *gin.Context) {
 	}
 
 	// Preload role untuk response
-	config.DB.Preload("Role.Permissions").First(&user, user.ID)
+	config.DB.Preload("Role.Permissions").First(&user, "id = ?", user.ID)
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Registrasi berhasil",
@@ -124,8 +122,14 @@ func GetProfile(c *gin.Context) {
 		return
 	}
 
+	userIDStr, ok := userID.(string)
+	if !ok || userIDStr == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Format User ID tidak valid"})
+		return
+	}
+
 	var user models.User
-	if err := config.DB.Preload("Role.Permissions").First(&user, userID).Error; err != nil {
+	if err := config.DB.Preload("Role.Permissions").Where("id = ?", userIDStr).First(&user).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User tidak ditemukan"})
 		return
 	}

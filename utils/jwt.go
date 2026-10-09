@@ -9,7 +9,7 @@ import (
 )
 
 type JWTClaims struct {
-	UserID uint   `json:"user_id"`
+	UserID string `json:"user_id"`
 	Email  string `json:"email"`
 	jwt.RegisteredClaims
 }
@@ -23,7 +23,7 @@ func getSecretKey() []byte {
 }
 
 // GenerateToken generates a signed JWT token valid for 24 hours
-func GenerateToken(userID uint, email string) (string, error) {
+func GenerateToken(userID string, email string) (string, error) {
 	claims := JWTClaims{
 		UserID: userID,
 		Email:  email,
@@ -57,4 +57,3 @@ func ValidateToken(tokenString string) (*JWTClaims, error) {
 
 	return claims, nil
 }
-

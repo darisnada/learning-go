@@ -33,10 +33,9 @@ func SeedPermissions(db *gorm.DB) map[string]models.Permission {
 		var perm models.Permission
 		err := db.Where("name = ?", p.Name).First(&perm).Error
 		if err != nil {
-			// Belum ada, simpan baru
 			if createErr := db.Create(&p).Error; createErr == nil {
 				permMap[p.Name] = p
-				log.Printf("[Seeder] Permission dibuat: %s", p.Name)
+				log.Printf("[Seeder] Permission dibuat: %s (%s)", p.Name, p.ID)
 			}
 		} else {
 			permMap[p.Name] = perm
@@ -83,10 +82,9 @@ func SeedRoles(db *gorm.DB, perms map[string]models.Permission) map[string]model
 		if err := db.Where("name = ?", r.Name).First(&existing).Error; err != nil {
 			if err := db.Create(&r).Error; err == nil {
 				roleMap[r.Name] = r
-				log.Printf("[Seeder] Role '%s' dibuat dengan permission terkait.", r.Name)
+				log.Printf("[Seeder] Role '%s' (%s) dibuat.", r.Name, r.ID)
 			}
 		} else {
-			// Update relasi permission jika role sudah ada
 			db.Model(&existing).Association("Permissions").Replace(r.Permissions)
 			roleMap[r.Name] = existing
 		}
@@ -151,7 +149,7 @@ func SeedUsers(db *gorm.DB, roles map[string]models.Role) *models.User {
 		if err := db.Create(&u).Error; err != nil {
 			log.Printf("[Seeder] Gagal membuat user '%s': %v", u.Email, err)
 		} else {
-			log.Printf("[Seeder] Akun dibuat: %s | Role: %d | Pass: %s", u.Email, u.RoleID, item.password)
+			log.Printf("[Seeder] Akun dibuat: %s | ID: %s | Role: %s | Pass: %s", u.Email, u.ID, u.RoleID, item.password)
 			if i == 0 {
 				firstAdmin = &u
 			}
@@ -170,8 +168,8 @@ func SeedProducts(db *gorm.DB, user *models.User) {
 		return
 	}
 
-	var userID uint = 1
-	if user != nil && user.ID != 0 {
+	var userID string
+	if user != nil && user.ID != "" {
 		userID = user.ID
 	}
 
@@ -217,7 +215,7 @@ func SeedProducts(db *gorm.DB, user *models.User) {
 		if err := db.Create(&prod).Error; err != nil {
 			log.Printf("[Seeder] Gagal membuat produk '%s': %v", prod.Name, err)
 		} else {
-			log.Printf("[Seeder] Produk berhasil dibuat: %s", prod.Name)
+			log.Printf("[Seeder] Produk berhasil dibuat: %s (UUID: %s)", prod.Name, prod.ID)
 		}
 	}
 }
