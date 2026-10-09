@@ -114,6 +114,51 @@ func main() {
 			// Izin: delete-product
 			products.DELETE("/:id", middlewares.RequirePermission("delete-product"), controllers.DeleteProduct)
 		}
+
+		// Role Routes (CRUD Role & Update Permissions)
+		roles := api.Group("/roles")
+		roles.Use(middlewares.AuthMiddleware())
+		{
+			// Izin: read-role
+			roles.GET("", middlewares.RequirePermission("read-role"), controllers.GetRoles)
+			roles.GET("/:id", middlewares.RequirePermission("read-role"), controllers.GetRoleByID)
+
+			// Izin: create-role
+			roles.POST("", middlewares.RequirePermission("create-role"), controllers.CreateRole)
+
+			// Izin: update-role
+			roles.PUT("/:id", middlewares.RequirePermission("update-role"), controllers.UpdateRole)
+
+			// Izin: update-role (khusus update daftar permissions)
+			roles.PUT("/:id/permissions", middlewares.RequirePermission("update-role"), controllers.UpdateRolePermissions)
+
+			// Izin: delete-role
+			roles.DELETE("/:id", middlewares.RequirePermission("delete-role"), controllers.DeleteRole)
+		}
+
+		// Permissions List Route (Daftar semua permissions yang ada di sistem)
+		api.GET("/permissions", middlewares.AuthMiddleware(), middlewares.RequirePermission("read-role"), controllers.GetPermissions)
+
+		// User Routes (Manajemen Pengguna & Update Role User)
+		users := api.Group("/users")
+		users.Use(middlewares.AuthMiddleware())
+		{
+			// Izin: read-user
+			users.GET("", middlewares.RequirePermission("read-user"), controllers.GetUsers)
+			users.GET("/:id", middlewares.RequirePermission("read-user"), controllers.GetUserByID)
+
+			// Izin: create-user
+			users.POST("", middlewares.RequirePermission("create-user"), controllers.CreateUser)
+
+			// Izin: update-user
+			users.PUT("/:id", middlewares.RequirePermission("update-user"), controllers.UpdateUser)
+
+			// Izin: update-user (khusus update role)
+			users.PUT("/:id/role", middlewares.RequirePermission("update-user"), controllers.UpdateUserRole)
+
+			// Izin: delete-user
+			users.DELETE("/:id", middlewares.RequirePermission("delete-user"), controllers.DeleteUser)
+		}
 	}
 
 	// 6. Jalankan server

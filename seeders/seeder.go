@@ -18,15 +18,28 @@ func SeedAll(db *gorm.DB) {
 	log.Println("Proses seeding selesai!")
 }
 
-// SeedPermissions membuat permission default: read-product, create-product, update-product, delete-product
+// SeedPermissions membuat permission default untuk produk, role, dan user
 func SeedPermissions(db *gorm.DB) map[string]models.Permission {
 	permMap := make(map[string]models.Permission)
 
 	permissions := []models.Permission{
+		// Permissions Produk
 		{Name: "read-product", Description: "Melihat daftar dan detail produk"},
 		{Name: "create-product", Description: "Menambahkan produk baru"},
 		{Name: "update-product", Description: "Memperbarui informasi produk"},
 		{Name: "delete-product", Description: "Menghapus produk"},
+
+		// Permissions Role Management
+		{Name: "read-role", Description: "Melihat daftar dan detail role"},
+		{Name: "create-role", Description: "Membuat role baru"},
+		{Name: "update-role", Description: "Memperbarui role dan permissions-nya"},
+		{Name: "delete-role", Description: "Menghapus role"},
+
+		// Permissions User Management
+		{Name: "read-user", Description: "Melihat daftar dan detail pengguna"},
+		{Name: "create-user", Description: "Membuat akun pengguna baru"},
+		{Name: "update-user", Description: "Memperbarui profil atau role pengguna"},
+		{Name: "delete-user", Description: "Menghapus akun pengguna"},
 	}
 
 	for _, p := range permissions {
@@ -50,30 +63,44 @@ func SeedPermissions(db *gorm.DB) map[string]models.Permission {
 func SeedRoles(db *gorm.DB, perms map[string]models.Permission) map[string]models.Role {
 	roleMap := make(map[string]models.Role)
 
-	pRead := perms["read-product"]
-	pCreate := perms["create-product"]
-	pUpdate := perms["update-product"]
-	pDelete := perms["delete-product"]
+	pReadProd := perms["read-product"]
+	pCreateProd := perms["create-product"]
+	pUpdateProd := perms["update-product"]
+	pDeleteProd := perms["delete-product"]
+
+	pReadRole := perms["read-role"]
+	pCreateRole := perms["create-role"]
+	pUpdateRole := perms["update-role"]
+	pDeleteRole := perms["delete-role"]
+
+	pReadUser := perms["read-user"]
+	pCreateUser := perms["create-user"]
+	pUpdateUser := perms["update-user"]
+	pDeleteUser := perms["delete-user"]
 
 	// Role Admin: Memiliki SEMUA permission
 	adminRole := models.Role{
 		Name:        "admin",
 		Description: "Akses penuh sistem",
-		Permissions: []models.Permission{pRead, pCreate, pUpdate, pDelete},
+		Permissions: []models.Permission{
+			pReadProd, pCreateProd, pUpdateProd, pDeleteProd,
+			pReadRole, pCreateRole, pUpdateRole, pDeleteRole,
+			pReadUser, pCreateUser, pUpdateUser, pDeleteUser,
+		},
 	}
 
-	// Role Staff: read, create, update (tidak bisa delete)
+	// Role Staff: read, create, update produk
 	staffRole := models.Role{
 		Name:        "staff",
 		Description: "Staf pengelola produk",
-		Permissions: []models.Permission{pRead, pCreate, pUpdate},
+		Permissions: []models.Permission{pReadProd, pCreateProd, pUpdateProd},
 	}
 
 	// Role User: hanya read-product
 	userRole := models.Role{
 		Name:        "user",
 		Description: "Pengguna biasa",
-		Permissions: []models.Permission{pRead},
+		Permissions: []models.Permission{pReadProd},
 	}
 
 	roles := []models.Role{adminRole, staffRole, userRole}

@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "c1f7b8a2-3e4b-4a5d-b891-98721cba1024",
 		"name": "Go REST API (Gin + GORM + MySQL RBAC UUID)",
-		"description": "Postman Collection lengkap untuk Go REST API dengan autentikasi JWT, UUID v4, dan RBAC (Role-Based Access Control).",
+		"description": "Postman Collection lengkap untuk Go REST API dengan autentikasi JWT, UUID v4, CRUD Produk, dan CRUD Role & Permissions.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"variable": [
@@ -18,7 +18,17 @@
 		},
 		{
 			"key": "productId",
-			"value": "8d78882e-42cb-4974-801b-cad0b8ffce38",
+			"value": "f4366eea-2d76-496a-a8f2-3f988b0df4ad",
+			"type": "string"
+		},
+		{
+			"key": "roleId",
+			"value": "5e82ebef-0edb-42d2-9b29-da807d647954",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "5c3a46b8-096d-4d16-a3ad-e48386bdbfb5",
 			"type": "string"
 		}
 	],
@@ -162,7 +172,7 @@
 								"login"
 							]
 						},
-						"description": "Login sebagai Staff (Bisa Read, Create, Update tapi tidak bisa Delete)."
+						"description": "Login sebagai Staff (Bisa Read, Create, Update produk)."
 					},
 					"response": []
 				},
@@ -206,7 +216,7 @@
 								"login"
 							]
 						},
-						"description": "Login sebagai User biasa (Hanya bisa Read/View)."
+						"description": "Login sebagai User biasa (Hanya bisa Read/View produk)."
 					},
 					"response": []
 				},
@@ -436,6 +446,476 @@
 							]
 						},
 						"description": "Menghapus produk berdasarkan UUID. Memerlukan permission 'delete-product' (Hanya Admin)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Roles & Permissions",
+			"item": [
+				{
+					"name": "Get All Permissions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/permissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"permissions"
+							]
+						},
+						"description": "Mengambil seluruh daftar permission di sistem."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Roles",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.length > 0) {",
+									"    pm.collectionVariables.set(\"roleId\", jsonData.data[1] ? jsonData.data[1].id : jsonData.data[0].id);",
+									"    console.log(\"Role ID disimpan: \" + pm.collectionVariables.get(\"roleId\"));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							]
+						},
+						"description": "Mengambil semua role beserta permissions-nya. Otomatis menyimpan salah satu role ID ke variabel {{roleId}}."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Role by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/{{roleId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"{{roleId}}"
+							]
+						},
+						"description": "Mengambil detail satu role beserta permissions terkait."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Role",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.id) {",
+									"    pm.collectionVariables.set(\"roleId\", jsonData.data.id);",
+									"    console.log(\"Role baru dibuat dengan ID: \" + jsonData.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"supervisor\",\n  \"description\": \"Supervisor operasional cabang\",\n  \"permission_ids\": []\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							]
+						},
+						"description": "Membuat role baru di sistem."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Role Info",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"senior-supervisor\",\n  \"description\": \"Supervisor senior cabang terupdate\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/{{roleId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"{{roleId}}"
+							]
+						},
+						"description": "Memperbarui nama dan deskripsi role."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Role Permissions (Assign)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"permission_ids\": [\n    \"3830afbd-65a8-4539-bec9-d3c4da141eda\",\n    \"3d1526ed-b52a-4ee3-8f75-2766ef2e71c2\"\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/{{roleId}}/permissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"{{roleId}}",
+								"permissions"
+							]
+						},
+						"description": "Mengganti/memperbarui daftar permissions yang dipegang oleh suatu role."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Role",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/{{roleId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"{{roleId}}"
+							]
+						},
+						"description": "Menghapus role (role bawaan 'admin'/'user' serta role yang masih dipakai user tidak bisa dihapus)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Users",
+			"item": [
+				{
+					"name": "Get All Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.length > 0) {",
+									"    pm.collectionVariables.set(\"userId\", jsonData.data[1] ? jsonData.data[1].id : jsonData.data[0].id);",
+									"    console.log(\"User ID disimpan: \" + pm.collectionVariables.get(\"userId\"));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Mengambil semua pengguna. Otomatis menyimpan salah satu user ID ke variabel {{userId}}."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users?search=staff",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "staff"
+								}
+							]
+						},
+						"description": "Mencari pengguna berdasarkan nama atau email."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{userId}}"
+							]
+						},
+						"description": "Mengambil detail satu pengguna berdasarkan ID UUID."
+					},
+					"response": []
+				},
+				{
+					"name": "Create User (by Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.id) {",
+									"    pm.collectionVariables.set(\"userId\", jsonData.data.id);",
+									"    console.log(\"User baru dibuat dengan ID: \" + jsonData.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Dian Sastro\",\n  \"email\": \"dian@example.com\",\n  \"password\": \"password123\",\n  \"role_id\": \"{{roleId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Admin membuat pengguna baru dan langsung memilih role-nya."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Info",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Dian Sastrowardoyo\",\n  \"email\": \"dian.new@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{userId}}"
+							]
+						},
+						"description": "Memperbarui profil (nama/email) pengguna."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Role",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"role_id\": \"{{roleId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{userId}}/role",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{userId}}",
+								"role"
+							]
+						},
+						"description": "Khusus mengganti / memindahkan role pengguna."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{userId}}"
+							]
+						},
+						"description": "Menghapus akun pengguna dari sistem (tidak bisa menghapus akun sendiri)."
 					},
 					"response": []
 				}
