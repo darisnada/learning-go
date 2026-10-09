@@ -26,14 +26,14 @@ type LoginInput struct {
 func Register(c *gin.Context) {
 	var input RegisterInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.ValidationErrorResponse(c, err)
 		return
 	}
 
 	// Cek apakah email sudah terdaftar
 	var existingUser models.User
 	if err := config.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "Email sudah terdaftar"})
+		utils.ErrorResponse(c, http.StatusConflict, "Email sudah terdaftar")
 		return
 	}
 
@@ -53,12 +53,12 @@ func Register(c *gin.Context) {
 	}
 
 	if err := user.HashPassword(input.Password); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengenkripsi kata sandi"})
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Gagal mengenkripsi kata sandi")
 		return
 	}
 
 	if err := config.DB.Create(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat pengguna: " + err.Error()})
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Gagal membuat pengguna: "+err.Error())
 		return
 	}
 
@@ -81,24 +81,24 @@ func Register(c *gin.Context) {
 func Login(c *gin.Context) {
 	var input LoginInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.ValidationErrorResponse(c, err)
 		return
 	}
 
 	var user models.User
 	if err := config.DB.Preload("Role.Permissions").Where("email = ?", input.Email).First(&user).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email atau kata sandi salah"})
+		utils.ErrorResponse(c, http.StatusUnauthorized, "Email atau kata sandi salah")
 		return
 	}
 
 	if err := user.CheckPassword(input.Password); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email atau kata sandi salah"})
+		utils.ErrorResponse(c, http.StatusUnauthorized, "Email atau kata sandi salah")
 		return
 	}
 
 	token, err := utils.GenerateToken(user.ID, user.Email)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menghasilkan token"})
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Gagal menghasilkan token")
 		return
 	}
 
@@ -118,19 +118,19 @@ func Login(c *gin.Context) {
 func GetProfile(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID tidak ditemukan pada sesi"})
+		utils.ErrorResponse(c, http.StatusUnauthorized, "User ID tidak ditemukan pada sesi")
 		return
 	}
 
 	userIDStr, ok := userID.(string)
 	if !ok || userIDStr == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Format User ID tidak valid"})
+		utils.ErrorResponse(c, http.StatusUnauthorized, "Format User ID tidak valid")
 		return
 	}
 
 	var user models.User
 	if err := config.DB.Preload("Role.Permissions").Where("id = ?", userIDStr).First(&user).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User tidak ditemukan"})
+		utils.ErrorResponse(c, http.StatusNotFound, "User tidak ditemukan")
 		return
 	}
 

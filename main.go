@@ -64,6 +64,20 @@ func main() {
 	// 5. Inisialisasi router Gin
 	r := gin.Default()
 
+	// Penanganan Error Global 404 Route Not Found dalam format JSON
+	r.NoRoute(func(c *gin.Context) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Endpoint URL tidak ditemukan",
+		})
+	})
+
+	// Penanganan Error Global 405 Method Not Allowed dalam format JSON
+	r.NoMethod(func(c *gin.Context) {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{
+			"error": "Metode HTTP tidak diizinkan untuk endpoint ini",
+		})
+	})
+
 	// Root / Health Check
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

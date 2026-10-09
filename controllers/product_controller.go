@@ -5,8 +5,10 @@ import (
 
 	"go-learning/config"
 	"go-learning/models"
+	"go-learning/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type ProductInput struct {
@@ -28,7 +30,7 @@ func GetProducts(c *gin.Context) {
 	}
 
 	if err := query.Find(&products).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data produk"})
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Gagal mengambil data produk: "+err.Error())
 		return
 	}
 
@@ -41,10 +43,16 @@ func GetProducts(c *gin.Context) {
 // GetProductByID menampilkan detail satu produk berdasarkan ID UUID
 func GetProductByID(c *gin.Context) {
 	id := c.Param("id")
-	var product models.Product
 
+	// Validasi format UUID
+	if _, err := uuid.Parse(id); err != nil {
+		utils.ErrorResponse(c, http.StatusBadRequest, "Format ID tidak valid (harus berupa UUID)")
+		return
+	}
+
+	var product models.Product
 	if err := config.DB.Preload("User").Where("id = ?", id).First(&product).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Produk tidak ditemukan"})
+		utils.ErrorResponse(c, http.StatusNotFound, "Produk dengan ID tersebut tidak ditemukan")
 		return
 	}
 
@@ -58,19 +66,19 @@ func GetProductByID(c *gin.Context) {
 func CreateProduct(c *gin.Context) {
 	var input ProductInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.ValidationErrorResponse(c, err)
 		return
 	}
 
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi diperlukan"})
+		utils.ErrorResponse(c, http.StatusUnauthorized, "Autentikasi diperlukan")
 		return
 	}
 
 	userIDStr, ok := userID.(string)
 	if !ok || userIDStr == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID tidak valid"})
+		utils.ErrorResponse(c, http.StatusUnauthorized, "Sesi User ID tidak valid")
 		return
 	}
 
@@ -83,7 +91,7 @@ func CreateProduct(c *gin.Context) {
 	}
 
 	if err := config.DB.Create(&product).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menyimpan produk: " + err.Error()})
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Gagal menyimpan data produk: "+err.Error())
 		return
 	}
 
@@ -96,16 +104,22 @@ func CreateProduct(c *gin.Context) {
 // UpdateProduct memperbarui data produk berdasarkan ID UUID
 func UpdateProduct(c *gin.Context) {
 	id := c.Param("id")
-	var product models.Product
 
+	// Validasi format UUID
+	if _, err := uuid.Parse(id); err != nil {
+		utils.ErrorResponse(c, http.StatusBadRequest, "Format ID tidak valid (harus berupa UUID)")
+		return
+	}
+
+	var product models.Product
 	if err := config.DB.Where("id = ?", id).First(&product).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Produk tidak ditemukan"})
+		utils.ErrorResponse(c, http.StatusNotFound, "Produk dengan ID tersebut tidak ditemukan")
 		return
 	}
 
 	var input ProductInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.ValidationErrorResponse(c, err)
 		return
 	}
 
@@ -115,7 +129,7 @@ func UpdateProduct(c *gin.Context) {
 	product.Stock = input.Stock
 
 	if err := config.DB.Save(&product).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal memperbarui produk: " + err.Error()})
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Gagal memperbarui data produk: "+err.Error())
 		return
 	}
 
@@ -128,15 +142,21 @@ func UpdateProduct(c *gin.Context) {
 // DeleteProduct menghapus produk berdasarkan ID UUID
 func DeleteProduct(c *gin.Context) {
 	id := c.Param("id")
-	var product models.Product
 
+	// Validasi format UUID
+	if _, err := uuid.Parse(id); err != nil {
+		utils.ErrorResponse(c, http.StatusBadRequest, "Format ID tidak valid (harus berupa UUID)")
+		return
+	}
+
+	var product models.Product
 	if err := config.DB.Where("id = ?", id).First(&product).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Produk tidak ditemukan"})
+		utils.ErrorResponse(c, http.StatusNotFound, "Produk dengan ID tersebut tidak ditemukan")
 		return
 	}
 
 	if err := config.DB.Delete(&product).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menghapus produk: " + err.Error()})
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Gagal menghapus produk: "+err.Error())
 		return
 	}
 
