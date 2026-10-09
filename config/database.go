@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"go-learning/models"
 
 	_ "github.com/go-sql-driver/mysql"
 	gormmysql "gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var DB *gorm.DB
@@ -46,9 +48,22 @@ func ConnectDatabase() {
 		initDB.Close()
 	}
 
-	// 2. Hubungkan ke database dengan GORM
+	// 2. Konfigurasi Logger GORM agar tidak menampilkan log error merah untuk "record not found"
+	dbLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold:             200 * time.Millisecond,
+			LogLevel:                  logger.Warn,
+			IgnoreRecordNotFoundError: true, // Sembunyikan pesan merah 'record not found' saat query 0 rows
+			Colorful:                  true,
+		},
+	)
+
+	// 3. Hubungkan ke database dengan GORM
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, dbName)
-	database, err := gorm.Open(gormmysql.Open(dsn), &gorm.Config{})
+	database, err := gorm.Open(gormmysql.Open(dsn), &gorm.Config{
+		Logger: dbLogger,
+	})
 	if err != nil {
 		log.Fatalf("Gagal terhubung ke database MySQL: %v", err)
 	}

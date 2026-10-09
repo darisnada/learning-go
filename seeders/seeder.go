@@ -30,15 +30,16 @@ func SeedPermissions(db *gorm.DB) map[string]models.Permission {
 	}
 
 	for _, p := range permissions {
-		var perm models.Permission
-		err := db.Where("name = ?", p.Name).First(&perm).Error
-		if err != nil {
-			if createErr := db.Create(&p).Error; createErr == nil {
+		var existingPerms []models.Permission
+		db.Where("name = ?", p.Name).Limit(1).Find(&existingPerms)
+
+		if len(existingPerms) == 0 {
+			if err := db.Create(&p).Error; err == nil {
 				permMap[p.Name] = p
 				log.Printf("[Seeder] Permission dibuat: %s (%s)", p.Name, p.ID)
 			}
 		} else {
-			permMap[p.Name] = perm
+			permMap[p.Name] = existingPerms[0]
 		}
 	}
 
@@ -78,13 +79,16 @@ func SeedRoles(db *gorm.DB, perms map[string]models.Permission) map[string]model
 	roles := []models.Role{adminRole, staffRole, userRole}
 
 	for _, r := range roles {
-		var existing models.Role
-		if err := db.Where("name = ?", r.Name).First(&existing).Error; err != nil {
+		var existingRoles []models.Role
+		db.Where("name = ?", r.Name).Limit(1).Find(&existingRoles)
+
+		if len(existingRoles) == 0 {
 			if err := db.Create(&r).Error; err == nil {
 				roleMap[r.Name] = r
 				log.Printf("[Seeder] Role '%s' (%s) dibuat.", r.Name, r.ID)
 			}
 		} else {
+			existing := existingRoles[0]
 			db.Model(&existing).Association("Permissions").Replace(r.Permissions)
 			roleMap[r.Name] = existing
 		}
