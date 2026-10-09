@@ -4,6 +4,11 @@
 # AI & Internal Documentation
 .ai-docs/
 
+# Uploaded media files
+uploads/products/*
+!uploads/products/.gitkeep
+!uploads/.gitkeep
+
 # Binaries and compiled files
 *.exe
 *.exe~

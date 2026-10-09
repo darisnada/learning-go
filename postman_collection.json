@@ -367,15 +367,37 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Mechanical Keyboard Custom\",\n  \"description\": \"Keyboard mekanik 75% hot-swappable dengan gasket mount.\",\n  \"price\": 1850000,\n  \"stock\": 12\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Mechanical Keyboard Custom RGB",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Keyboard mekanik 75% hot-swappable dengan gasket mount.",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "1850000",
+									"type": "text"
+								},
+								{
+									"key": "stock",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"description": "Pilih file gambar (.jpg, .jpeg, .png, .webp) di Postman"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/products",
@@ -387,7 +409,7 @@
 								"products"
 							]
 						},
-						"description": "Menambahkan produk baru dengan UUID otomatis. Memerlukan permission 'create-product'."
+						"description": "Menambahkan produk baru menggunakan multipart/form-data (mendukung upload file gambar). Memerlukan permission 'create-product'."
 					},
 					"response": []
 				},
@@ -399,15 +421,37 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Laptop Asus ROG Zephyrus G16 (2026)\",\n  \"description\": \"Versi upgrade dengan prosesor Intel Core Ultra 9 dan 32GB RAM.\",\n  \"price\": 28999000,\n  \"stock\": 10\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Laptop Asus ROG Zephyrus G16 (2026)",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Versi upgrade dengan prosesor Intel Core Ultra 9 dan 32GB RAM.",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "28999000",
+									"type": "text"
+								},
+								{
+									"key": "stock",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"description": "Pilih file gambar baru jika ingin mengganti gambar lama"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/products/{{productId}}",
@@ -420,7 +464,7 @@
 								"{{productId}}"
 							]
 						},
-						"description": "Memperbarui produk berdasarkan UUID. Memerlukan permission 'update-product'."
+						"description": "Memperbarui produk berdasarkan UUID menggunakan multipart/form-data (mendukung upload gambar baru). Memerlukan permission 'update-product'."
 					},
 					"response": []
 				},

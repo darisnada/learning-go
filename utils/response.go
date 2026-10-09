@@ -47,9 +47,9 @@ func ValidationErrorResponse(c *gin.Context, err error) {
 		return
 	}
 
-	// Jika format JSON tidak valid atau bukan validation error
+	// Jika format payload tidak valid atau bukan validation error
 	c.JSON(http.StatusBadRequest, gin.H{
-		"error": "Payload request JSON tidak valid atau rusak",
+		"error": "Payload request tidak valid: " + err.Error(),
 	})
 }
 

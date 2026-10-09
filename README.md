@@ -43,7 +43,9 @@ c:\project\go-learning\
 │   └── database.go           # Koneksi MySQL & Auto Migration
 ├── controllers/
 │   ├── auth_controller.go    # Handler Register, Login, Profile
-│   └── product_controller.go # Handler CRUD Produk
+│   ├── product_controller.go # Handler CRUD Produk
+│   ├── role_controller.go    # Handler CRUD Role & Permissions
+│   └── user_controller.go    # Handler CRUD User & Update Role
 ├── middlewares/
 │   ├── auth_middleware.go    # Verifikasi Bearer JWT
 │   └── permission_middleware.go # Verifikasi granular Permission (RBAC)
@@ -51,13 +53,20 @@ c:\project\go-learning\
 │   ├── rbac.go               # Model Role dan Permission
 │   ├── user.go               # Model User & method HasPermission
 │   └── product.go            # Model Product
+├── routes/
+│   ├── routes.go             # Pendaftaran route utama & handler 404/405
+│   ├── auth_routes.go        # Routing autentikasi
+│   ├── product_routes.go     # Routing produk
+│   ├── role_routes.go        # Routing role & permissions
+│   └── user_routes.go        # Routing manajemen pengguna
 ├── seeders/
 │   └── seeder.go             # Seeder Permissions, Roles, Users, Products
 ├── utils/
-│   └── jwt.go                # Fungsi Generate & Validate JWT
+│   ├── jwt.go                # Fungsi Generate & Validate JWT
+│   └── response.go           # Helper format respon error & validasi
 ├── .env                      # Konfigurasi database & port
 ├── .env.example              # Template variabel lingkungan
-├── main.go                   # Routing, Middleware, dan Server entrypoint
+├── main.go                   # Server entrypoint
 └── go.mod
 ```
 

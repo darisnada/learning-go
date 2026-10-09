@@ -210,6 +210,7 @@ func SeedProducts(db *gorm.DB, user *models.User) {
 			Description: "Laptop gaming bertenaga tinggi dengan layar 165Hz dan RTX 4070.",
 			Price:       24999000,
 			Stock:       15,
+			Image:       "/uploads/products/laptop-rog.jpg",
 			UserID:      userID,
 		},
 		{
@@ -217,6 +218,7 @@ func SeedProducts(db *gorm.DB, user *models.User) {
 			Description: "Keyboard mekanik wireless dengan switch Gateron Brown dan lampu RGB.",
 			Price:       1250000,
 			Stock:       30,
+			Image:       "/uploads/products/keyboard-keychron.jpg",
 			UserID:      userID,
 		},
 		{
@@ -224,6 +226,7 @@ func SeedProducts(db *gorm.DB, user *models.User) {
 			Description: "Mouse ergonomis nirkabel dengan klik senyap dan scroll elektromagnetik.",
 			Price:       1550000,
 			Stock:       25,
+			Image:       "/uploads/products/mouse-mxmaster.jpg",
 			UserID:      userID,
 		},
 		{
@@ -231,6 +234,7 @@ func SeedProducts(db *gorm.DB, user *models.User) {
 			Description: "Monitor gaming IPS 144Hz 1ms dengan resolusi QHD (2K).",
 			Price:       4350000,
 			Stock:       10,
+			Image:       "/uploads/products/monitor-lg.jpg",
 			UserID:      userID,
 		},
 		{
@@ -238,6 +242,7 @@ func SeedProducts(db *gorm.DB, user *models.User) {
 			Description: "Headphone wireless dengan fitur peredam bising (ANC) terbaik.",
 			Price:       4999000,
 			Stock:       8,
+			Image:       "/uploads/products/headphone-sony.jpg",
 			UserID:      userID,
 		},
 	}

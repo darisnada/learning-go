@@ -3,12 +3,10 @@ package main
 import (
 	"flag"
 	"log"
-	"net/http"
 	"os"
 
 	"go-learning/config"
-	"go-learning/controllers"
-	"go-learning/middlewares"
+	"go-learning/routes"
 	"go-learning/seeders"
 
 	"github.com/gin-gonic/gin"
@@ -61,107 +59,11 @@ func main() {
 	// Default: selalu jalankan migrasi tabel sebelum menyalakan server
 	config.Migrate()
 
-	// 5. Inisialisasi router Gin
+	// 5. Inisialisasi router Gin dan daftarkan routing secara modular
 	r := gin.Default()
+	routes.SetupRoutes(r)
 
-	// Penanganan Error Global 404 Route Not Found dalam format JSON
-	r.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Endpoint URL tidak ditemukan",
-		})
-	})
-
-	// Penanganan Error Global 405 Method Not Allowed dalam format JSON
-	r.NoMethod(func(c *gin.Context) {
-		c.JSON(http.StatusMethodNotAllowed, gin.H{
-			"error": "Metode HTTP tidak diizinkan untuk endpoint ini",
-		})
-	})
-
-	// Root / Health Check
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "API Go + Gin + GORM + MySQL (RBAC Active) berjalan normal!",
-			"status":  "healthy",
-		})
-	})
-
-	api := r.Group("/api")
-	{
-		// Auth Routes
-		auth := api.Group("/auth")
-		{
-			auth.POST("/register", controllers.Register)
-			auth.POST("/login", controllers.Login)
-			// Endpoint profile memerlukan token login
-			auth.GET("/me", middlewares.AuthMiddleware(), controllers.GetProfile)
-		}
-
-		// Product Routes (Dilindungi oleh Auth & Permission RBAC)
-		products := api.Group("/products")
-		products.Use(middlewares.AuthMiddleware())
-		{
-			// Izin: read-product
-			products.GET("", middlewares.RequirePermission("read-product"), controllers.GetProducts)
-			products.GET("/:id", middlewares.RequirePermission("read-product"), controllers.GetProductByID)
-
-			// Izin: create-product
-			products.POST("", middlewares.RequirePermission("create-product"), controllers.CreateProduct)
-
-			// Izin: update-product
-			products.PUT("/:id", middlewares.RequirePermission("update-product"), controllers.UpdateProduct)
-
-			// Izin: delete-product
-			products.DELETE("/:id", middlewares.RequirePermission("delete-product"), controllers.DeleteProduct)
-		}
-
-		// Role Routes (CRUD Role & Update Permissions)
-		roles := api.Group("/roles")
-		roles.Use(middlewares.AuthMiddleware())
-		{
-			// Izin: read-role
-			roles.GET("", middlewares.RequirePermission("read-role"), controllers.GetRoles)
-			roles.GET("/:id", middlewares.RequirePermission("read-role"), controllers.GetRoleByID)
-
-			// Izin: create-role
-			roles.POST("", middlewares.RequirePermission("create-role"), controllers.CreateRole)
-
-			// Izin: update-role
-			roles.PUT("/:id", middlewares.RequirePermission("update-role"), controllers.UpdateRole)
-
-			// Izin: update-role (khusus update daftar permissions)
-			roles.PUT("/:id/permissions", middlewares.RequirePermission("update-role"), controllers.UpdateRolePermissions)
-
-			// Izin: delete-role
-			roles.DELETE("/:id", middlewares.RequirePermission("delete-role"), controllers.DeleteRole)
-		}
-
-		// Permissions List Route (Daftar semua permissions yang ada di sistem)
-		api.GET("/permissions", middlewares.AuthMiddleware(), middlewares.RequirePermission("read-role"), controllers.GetPermissions)
-
-		// User Routes (Manajemen Pengguna & Update Role User)
-		users := api.Group("/users")
-		users.Use(middlewares.AuthMiddleware())
-		{
-			// Izin: read-user
-			users.GET("", middlewares.RequirePermission("read-user"), controllers.GetUsers)
-			users.GET("/:id", middlewares.RequirePermission("read-user"), controllers.GetUserByID)
-
-			// Izin: create-user
-			users.POST("", middlewares.RequirePermission("create-user"), controllers.CreateUser)
-
-			// Izin: update-user
-			users.PUT("/:id", middlewares.RequirePermission("update-user"), controllers.UpdateUser)
-
-			// Izin: update-user (khusus update role)
-			users.PUT("/:id/role", middlewares.RequirePermission("update-user"), controllers.UpdateUserRole)
-
-			// Izin: delete-user
-			users.DELETE("/:id", middlewares.RequirePermission("delete-user"), controllers.DeleteUser)
-		}
-	}
-
-	// 6. Jalankan server
+	// 6. Jalankan server HTTP
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
